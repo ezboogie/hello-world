@@ -1,0 +1,28 @@
+import requests
+import csv
+import gzip
+import io
+
+# URL to download
+url = "https://epss.cyentia.com/epss_scores-current.csv.gz"
+
+# Send a GET request to the URL
+response = requests.get(url)
+
+# Read the gzip file contents
+file_content = gzip.GzipFile(fileobj=io.BytesIO(response.content)).read()
+
+# Decode the file contents as UTF-8
+decoded_content = file_content.decode('utf-8')
+
+# Use CSV module to parse the decoded content
+csv_reader = csv.reader(decoded_content.splitlines(), delimiter=',')
+data = list(csv_reader)
+
+# Remove the first row of the data (header row)
+del data[0]
+
+# Save the data to a CSV file
+with open('epss_scores.csv', mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerows(data)
